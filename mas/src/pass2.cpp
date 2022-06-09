@@ -1,6 +1,7 @@
 #include "../inc/pass2.h"
 #include <cstring>
 #include <iomanip>
+#include <sstream>
 
 AllocationException::AllocationException(const Position *pos, const std::string &message) :
         Exception(pos, message) {}
