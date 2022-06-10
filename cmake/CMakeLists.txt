@@ -15,5 +15,5 @@ add_executable(mas
         ../mas/src/diagn.cpp
         ../mas/src/cursor.cpp
         ../mas/src/pass1.cpp
-        ../mas/src/mic_instr_bits.cpp
+        ../emu/src/mic_instr_bits.cpp
         ../mas/src/pass2.cpp)

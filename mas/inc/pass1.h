@@ -9,7 +9,7 @@
 
 #include "diagn.h"
 #include "cursor.h"
-#include "mic_instr_bits.h"
+#include "../../emu/inc/mic_instr_bits.h"
 
 struct Label {
     uint16_t address;
