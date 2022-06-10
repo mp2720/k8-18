@@ -99,6 +99,7 @@ public:
     std::vector<MicInstr> mic_instrs;
 
     explicit PassOne(Cursor *cursor);
+    PassOne();
     ~PassOne();
 
     /** Execute stage. */

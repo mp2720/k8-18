@@ -16,7 +16,7 @@ class PassTwo {
     static constexpr uint16_t MC_SIZE = 4096;
     static constexpr uint16_t MP_START = 0;
     static constexpr uint16_t MP_END = MP_START + 255;
-    static constexpr uint16_t PP_START = 0x8ff;
+    static constexpr uint16_t PP_START = 0x800;
     static constexpr uint16_t PP_END = PP_START + 255;
 
     /** Карта адресов микрокода. */
@@ -29,6 +29,7 @@ class PassTwo {
     std::ostream &bin_stream;
     /** Выходной поток с информацией о метках. */
     std::ostream &labels_stream;
+    static constexpr size_t BYTES_SIZE = MC_SIZE * MicInstrBits::SIZE_BYTES;
     uint8_t *bytes;
 
     void report_label(const std::string &name, const Label &label);
@@ -43,6 +44,7 @@ class PassTwo {
     /** Поиск метки с именем name. Если она найдена, то address изменяется на адрес метки, возвращается true, иначе
      *  false и выдаётся сообщение об ошибке на позиции pos. */
     bool find_label_address(const Position *pos, const std::string &name, uint16_t &address);
+    void proc_prev_mic_instr(MicInstr *prev, uint16_t cur_address, uint16_t prev_address);
 
 public:
     PassTwo(std::map<std::string, Label> (&labels)[4], std::vector<MicInstr> &mic_instrs,

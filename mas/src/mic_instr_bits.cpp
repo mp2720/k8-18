@@ -11,8 +11,8 @@ int MicInstrBits::get_field(Bit start, size_t size) const {
     int value = 0;
 
     for (size_t i = size; i != 0; i--) {
-        value |= bits.test(start + i - 1) & 1;
         value <<= 1;
+        value |= bits.test(start + i - 1) & 1;
     }
 
     return value;

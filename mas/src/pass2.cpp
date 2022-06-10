@@ -21,8 +21,8 @@ PassTwo::PassTwo(std::map<std::string, Label> (&labels)[4], std::vector<MicInstr
         mic_instr_mask(mic_instr_mask),
         bin_stream(bin_stream),
         labels_stream(labels_stream) {
-    bytes = new uint8_t[MC_SIZE * sizeof(*bytes)];
-    memset((void *) bytes, 0, MC_SIZE * sizeof(*bytes));
+    bytes = new uint8_t[BYTES_SIZE];
+    memset((void *) bytes, 0, BYTES_SIZE * sizeof(*bytes));
 }
 
 PassTwo::~PassTwo() {
@@ -75,8 +75,30 @@ bool PassTwo::find_label_address(const Position *pos, const std::string &name, u
     return false;
 }
 
+void PassTwo::proc_prev_mic_instr(MicInstr *prev, uint16_t cur_address, uint16_t prev_address) {
+    if (prev == nullptr)
+        return;
+
+    // Если NMIP не был указан, значит NMIP предыдущей микроинструкции - адрес текущей.
+    if (prev->nmip.type == Nmip::TYPE_NONE) {
+        if (cur_address == prev_address)
+            prev->nmip = Nmip(0); // Если текущий адрес равен предыдущему, то это последняя микроинструкция.
+        else
+            prev->nmip = Nmip(cur_address);
+    }
+
+    prev->bits.set_field(NMIP0, 12, prev->nmip.address);
+
+    if (prev->bits.get_bit(CND))
+        prev->bits.set_field(CND_NMIP0, 12, prev->cnd_nmip.address);
+
+    // Запись байтов микроинструкции в массив.
+    for (int i = 0, bit = 48; i < 7; i++, bit -= 8)
+        bytes[prev_address * MicInstrBits::SIZE_BYTES + i] = prev->bits.get_field(Bit(bit), 8);
+}
+
 void PassTwo::exec() {
-    // @instr(<address>).
+    // @instr(<cur_address>).
     for (auto &pair: labels[PAGE_WITH_ADDRESS]) {
         auto &label = pair.second;
         try_occupy(&label.pos, label.address);
@@ -92,32 +114,21 @@ void PassTwo::exec() {
 
     MicInstr *prev = nullptr;
     uint16_t prev_address = 0;
-    uint16_t address;
+    uint16_t cur_address;
+
     for (auto &mi: mic_instrs) {
         if (mi.label.empty())
-            address = alloc(&mi.pos, last, MC_SIZE - 1);
-        else if (!find_label_address(&mi.pos, mi.label, address))
+            cur_address = alloc(&mi.pos, last, MC_SIZE - 1);
+        else if (!find_label_address(&mi.pos, mi.label, cur_address))
             continue; // Если метка не найдена, значит адрес не установлен и дальнейшие действия не требуются.
 
-        if (prev != nullptr) {
-            // Если NMIP не был указан, значит NMIP предыдущей микроинструкции - адрес текущей.
-            if (prev->nmip.type == Nmip::TYPE_NONE)
-                prev->nmip = Nmip(address);
-
-            // Запись байтов микроинструкции в массив. Работа этого кода зависит от компилятора, порядка байтов и т.д.!
-            union {
-                uint64_t u64;
-                uint8_t bytes[8];
-            } u{};
-            u.u64 = uint64_t(prev->bits.bits.to_ullong()) ^ mic_instr_mask;
-
-            for (int i = 0; i < 7; i++)
-                bytes[prev_address + i] = u.bytes[i];
-        }
-
+        proc_prev_mic_instr(prev, cur_address, prev_address);
         prev = &mi;
-        prev_address = address;
+        prev_address = cur_address;
     }
 
-    bin_stream.write((char *) bytes, std::streamsize(MC_SIZE * sizeof(*bytes)));
+    // Последняя инструкция тоже должна быть обработана.
+    proc_prev_mic_instr(prev, cur_address, prev_address);
+
+    bin_stream.write((char *) bytes, std::streamsize(BYTES_SIZE * sizeof(*bytes)));
 }

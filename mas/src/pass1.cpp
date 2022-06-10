@@ -170,6 +170,9 @@ void PassOne::proc_mem_opnd(const std::string &opnd1, const std::string &opnd2) 
 }
 
 void PassOne::proc_reg8_opnd(bool is_dest, const std::string &opnd) {
+    if (opnd == "0")
+        return;
+
     std::string gregs[4] = {"b", "a", "y", "x"};
     std::string sregs[8] = {"ipl", "iph", "spl", "sph", "tmpl", "tmph", "md", "ss"};
 
@@ -201,7 +204,7 @@ void PassOne::proc_reg8_opnd(bool is_dest, const std::string &opnd) {
         }
     }
 
-    expected("B, A, X, Y, IPL, IPH, SPL, SPH, TMPL, TMPH, MD, SS register expected");
+    expected("B, A, X, Y, IPL, IPH, SPL, SPH, TMPL, TMPH, MD, SS register");
 }
 
 void PassOne::proc_dir(const std::string &dir) {
@@ -375,7 +378,7 @@ void PassOne::proc_mnemonic(const std::string &str) {
         cursor->skip_blank();
 
         opnds[opnds_count] = cursor->eat_opnd();
-        if (opnds_count >= 2) {
+        if (opnds_count >= 3) {
             error("too many opnds provided");
             return;
         }
@@ -576,3 +579,5 @@ void PassOne::exec() {
         }
     }
 }
+PassOne::PassOne() :
+        PassOne(nullptr) {}

@@ -28,7 +28,13 @@ int main(int argc, char *argv[]) {
         return -1;
     }
 
-    PassOne p1 = PassOne(Cursor::from_file_path(source_path));
+    auto *cursor = Cursor::from_file_path(source_path);
+    if (cursor == nullptr) {
+        std::cout << "Cannot open source file.";
+        return -1;
+    }
+
+    PassOne p1 = PassOne(cursor);
     p1.exec();
     handle_errors();
 
