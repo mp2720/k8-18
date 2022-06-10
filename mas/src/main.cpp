@@ -55,7 +55,8 @@ int main(int argc, char *argv[]) {
     Diagn::report(std::cout); // Выдать предупреждения.
 
     std::cout << "generated " << p2.occupied << '/' << PassTwo::MC_SIZE << " microinstructions of microcode ("
-              << std::fixed << std::setprecision(1) << float(p2.occupied) / PassTwo::MC_SIZE * 100.0f << "%)";
+              << std::fixed << std::setprecision(1) << float(p2.occupied) / PassTwo::MC_SIZE * 100.0f << "% occupied"
+              << ")" << std::endl;
 
     return 0;
 }
