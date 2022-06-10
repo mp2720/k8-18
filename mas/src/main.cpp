@@ -19,7 +19,7 @@ int main(int argc, char *argv[]) {
                     << argv[0] << " - K8-18 microassembler\n"
                     << "Usage:\n"
                     << "\t" << argv[0] << " -h           print this help message\n"
-                    << "\t" << argv[0] << " <source>     assemble file, write output to 'mc.bin' and 'labels.txt'\n";
+                    << "\t" << argv[0] << " <source>     assemble file, write output to 'mc.bin' and 'info.txt'\n";
             return 0;
         }
 
