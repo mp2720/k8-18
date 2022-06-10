@@ -6,21 +6,21 @@
 AllocationException::AllocationException(const Position *pos, const std::string &message) :
         Exception(pos, message) {}
 
-std::string i2hex(uint16_t i) {
+std::string i2hex(uint16_t i, int digs_num) {
     std::stringstream stream;
     stream << "0x"
-           << std::setfill('0') << std::setw(3)
+           << std::setfill('0') << std::setw(digs_num)
            << std::hex << i;
     return stream.str();
 }
 
 PassTwo::PassTwo(std::map<std::string, Label> (&labels)[4], std::vector<MicInstr> &mic_instrs,
-                 uint64_t mic_instr_mask, std::ostream &bin_stream, std::ostream &labels_stream) :
+                 uint64_t mic_instr_mask, std::ostream &bin_stream, std::ostream &info) :
         labels(labels),
         mic_instrs(mic_instrs),
-        mic_instr_mask(mic_instr_mask),
-        bin_stream(bin_stream),
-        labels_stream(labels_stream) {
+        bin(bin_stream),
+        info(info),
+        occupied(0) {
     bytes = new uint8_t[BYTES_SIZE];
     memset((void *) bytes, 0, BYTES_SIZE * sizeof(*bytes));
 }
@@ -30,7 +30,30 @@ PassTwo::~PassTwo() {
 }
 
 void PassTwo::report_label(const std::string &name, const Label &label) {
-    labels_stream << name << ": " << i2hex(label.address) << '\n';
+    info << name << ": " << i2hex(label.address, 3) << '\n';
+}
+
+void PassTwo::occupy(uint16_t address) {
+    map.set(address);
+    occupied++;
+}
+
+void PassTwo::try_occupy(const Position *pos, uint16_t address) {
+    if (map.test(address))
+        throw AllocationException(pos, "address is already occupied");
+    else
+        occupy(address);
+}
+
+uint16_t PassTwo::alloc(const Position *pos, uint16_t start, uint16_t end) {
+    for (uint16_t cur = start; cur <= end; cur++) {
+        if (!map.test(cur)) {
+            occupy(cur);
+            return cur;
+        }
+    }
+
+    throw AllocationException(pos, "no space left");
 }
 
 uint16_t PassTwo::alloc_labels(std::map<std::string, Label> &labels_map, uint16_t start, uint16_t end) {
@@ -43,24 +66,6 @@ uint16_t PassTwo::alloc_labels(std::map<std::string, Label> &labels_map, uint16_
     }
 
     return cur;
-}
-
-uint16_t PassTwo::alloc(const Position *pos, uint16_t start, uint16_t end) {
-    for (uint16_t cur = start; cur <= end; cur++) {
-        if (!map.test(cur)) {
-            map.set(cur);
-            return cur;
-        }
-    }
-
-    throw AllocationException(pos, "no space left");
-}
-
-void PassTwo::try_occupy(const Position *pos, uint16_t address) {
-    if (map.test(address))
-        throw AllocationException(pos, "address is already occupied");
-    else
-        map.set(address);
 }
 
 bool PassTwo::find_label_address(const Position *pos, const std::string &name, uint16_t &address) {
@@ -130,5 +135,17 @@ void PassTwo::exec() {
     // Последняя инструкция тоже должна быть обработана.
     proc_prev_mic_instr(prev, cur_address, prev_address);
 
-    bin_stream.write((char *) bytes, std::streamsize(BYTES_SIZE * sizeof(*bytes)));
+    bin.write((char *) bytes, std::streamsize(BYTES_SIZE * sizeof(*bytes)));
+
+    report_map();
+}
+
+void PassTwo::report_map() {
+    constexpr int ROW_SIZE = 64;
+
+    for (uint16_t i = 0; i < 4096; i += ROW_SIZE) {
+        info << '\n' << i2hex(i, 3) << ' ';
+        for (uint16_t j = 0; j < ROW_SIZE; j++)
+            info << (map.test(i + j) ? '+' : '.');
+    }
 }

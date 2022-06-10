@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cstring>
+#include <iomanip>
 #include "../inc/pass1.h"
 #include "../inc/pass2.h"
 
@@ -24,13 +25,13 @@ int main(int argc, char *argv[]) {
 
         source_path = argv[1];
     } else {
-        std::cout << "Invalid usage. Type " << argv[0] << " -h to get help.";
+        std::cout << "Invalid usage. Type " << argv[0] << " -h to get help.\n";
         return -1;
     }
 
     auto *cursor = Cursor::from_file_path(source_path);
     if (cursor == nullptr) {
-        std::cout << "Cannot open source file.";
+        std::cout << "Cannot open source file.\n";
         return -1;
     }
 
@@ -39,20 +40,22 @@ int main(int argc, char *argv[]) {
     handle_errors();
 
     std::ofstream bin_file("mc.bin", std::ios::out | std::ios::binary),
-            labels_file("labels.txt", std::ios::out);
+            labels_file("info.txt", std::ios::out);
     if (!bin_file) {
-        Diagn::error(nullptr, "cannot open output 'mc.bin' file");
+        std::cout << "cannot open output 'mc.bin' file\n";
         return -1;
     } else if (!labels_file) {
-        Diagn::error(nullptr, "cannot open 'labels.txt' file");
+        std::cout << "cannot open 'info.txt' file\n";
         return -1;
     }
 
     PassTwo p2 = PassTwo(p1.labels, p1.mic_instrs, 0, bin_file, labels_file);
     p2.exec();
     handle_errors();
-
     Diagn::report(std::cout); // Выдать предупреждения.
+
+    std::cout << "generated " << p2.occupied << '/' << PassTwo::MC_SIZE << " microinstructions of microcode ("
+              << std::fixed << std::setprecision(1) << float(p2.occupied) / PassTwo::MC_SIZE * 100.0f << "%)";
 
     return 0;
 }

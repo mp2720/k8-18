@@ -13,7 +13,10 @@ public:
 };
 
 class PassTwo {
+public:
     static constexpr uint16_t MC_SIZE = 4096;
+
+private:
     static constexpr uint16_t MP_START = 0;
     static constexpr uint16_t MP_END = MP_START + 255;
     static constexpr uint16_t PP_START = 0x800;
@@ -23,35 +26,41 @@ class PassTwo {
     std::bitset<MC_SIZE> map;
     std::map<std::string, Label> (&labels)[4];
     std::vector<MicInstr> &mic_instrs;
-    /** Маска, которая применяется к каждой микроинструкции с помощью XOR. */
-    uint64_t mic_instr_mask;
     /** Выходной поток бинарного микрокода. */
-    std::ostream &bin_stream;
+    std::ostream &bin;
     /** Выходной поток с информацией о метках. */
-    std::ostream &labels_stream;
+    std::ostream &info;
     static constexpr size_t BYTES_SIZE = MC_SIZE * MicInstrBits::SIZE_BYTES;
     uint8_t *bytes;
 
     void report_label(const std::string &name, const Label &label);
-    /** Обработка меток, которые необходимо распределить на промежутке start...end. Возвращает адрес последней
-     *  распределённой метки. */
-    uint16_t alloc_labels(std::map<std::string, Label> &labels_map, uint16_t start, uint16_t end);
+    /** Занять адрес и увеличить occupied. */
+    void occupy(uint16_t address);
+    /** Попытка занять адрес. Если адрес уже занят, то будет выброшено исключение. */
+    void try_occupy(const Position *pos, uint16_t address);
     /** Выделение адреса в промежутке start...end. Если в нём нет свободного места, выбрасывается
      *  AllocationException, иначе возвращается выделенный адрес. */
     uint16_t alloc(const Position *pos, uint16_t start, uint16_t end);
-    /** Попытка занять адрес. Если адрес уже занят, то будет выброшено исключение. */
-    void try_occupy(const Position *pos, uint16_t address);
+    /** Обработка меток, которые необходимо распределить на промежутке start...end. Возвращает адрес последней
+     *  распределённой метки. */
+    uint16_t alloc_labels(std::map<std::string, Label> &labels_map, uint16_t start, uint16_t end);
     /** Поиск метки с именем name. Если она найдена, то address изменяется на адрес метки, возвращается true, иначе
      *  false и выдаётся сообщение об ошибке на позиции pos. */
     bool find_label_address(const Position *pos, const std::string &name, uint16_t &address);
     void proc_prev_mic_instr(MicInstr *prev, uint16_t cur_address, uint16_t prev_address);
+    /** Вывести информацию о заполнении микрокода в info. */
+    void report_map();
 
 public:
+    /** Количество занятых адресов. */
+    uint16_t occupied;
+
     PassTwo(std::map<std::string, Label> (&labels)[4], std::vector<MicInstr> &mic_instrs,
-            uint64_t mic_instr_mask, std::ostream &bin, std::ostream &labels_stream);
+            uint64_t mic_instr_mask, std::ostream &bin, std::ostream &info);
     ~PassTwo();
 
     void exec();
+
 };
 
 #endif
