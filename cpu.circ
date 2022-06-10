@@ -135,41 +135,6 @@
     <tool lib="4" name="D Flip-Flop"/>
     <tool lib="4" name="Register"/>
   </toolbar>
-  <circuit name="changes">
-    <a name="appearance" val="logisim_evolution"/>
-    <a name="circuit" val="changes"/>
-    <a name="circuitnamedboxfixedsize" val="true"/>
-    <a name="simulationFrequency" val="4096.0"/>
-    <comp lib="8" loc="(134,35)" name="Text">
-      <a name="font" val="SansSerif bold 11"/>
-      <a name="text" val="Изменение"/>
-    </comp>
-    <comp lib="8" loc="(429,36)" name="Text">
-      <a name="font" val="SansSerif bold 11"/>
-      <a name="text" val="Ссылка"/>
-    </comp>
-    <comp lib="8" loc="(52,35)" name="Text">
-      <a name="font" val="SansSerif bold 11"/>
-      <a name="text" val="Дата"/>
-    </comp>
-    <wire from="(30,20)" to="(30,40)"/>
-    <wire from="(30,20)" to="(90,20)"/>
-    <wire from="(30,230)" to="(90,230)"/>
-    <wire from="(30,40)" to="(30,230)"/>
-    <wire from="(30,40)" to="(90,40)"/>
-    <wire from="(400,20)" to="(400,40)"/>
-    <wire from="(400,20)" to="(680,20)"/>
-    <wire from="(400,230)" to="(680,230)"/>
-    <wire from="(400,40)" to="(400,230)"/>
-    <wire from="(400,40)" to="(680,40)"/>
-    <wire from="(680,20)" to="(680,40)"/>
-    <wire from="(680,40)" to="(680,230)"/>
-    <wire from="(90,20)" to="(400,20)"/>
-    <wire from="(90,20)" to="(90,40)"/>
-    <wire from="(90,230)" to="(400,230)"/>
-    <wire from="(90,40)" to="(400,40)"/>
-    <wire from="(90,40)" to="(90,230)"/>
-  </circuit>
   <circuit name="main">
     <a name="appearance" val="logisim_evolution"/>
     <a name="circuit" val="main"/>
@@ -382,7 +347,7 @@
       <a name="addrWidth" val="12"/>
       <a name="appearance" val="classic"/>
       <a name="contents">addr/data: 12 56
-0
+100005000011 200080000000 56000400
 </a>
       <a name="dataWidth" val="56"/>
     </comp>
@@ -563,8 +528,8 @@
       <circ-port height="10" pin="250,250" width="10" x="55" y="25"/>
       <circ-port height="10" pin="770,200" width="10" x="255" y="15"/>
       <circ-port height="10" pin="770,220" width="10" x="215" y="15"/>
-      <circ-port height="10" pin="770,240" width="10" x="135" y="15"/>
-      <circ-port height="10" pin="770,260" width="10" x="175" y="15"/>
+      <circ-port height="10" pin="770,240" width="10" x="175" y="15"/>
+      <circ-port height="10" pin="770,260" width="10" x="135" y="15"/>
       <circ-port height="8" pin="250,370" width="8" x="56" y="76"/>
       <circ-port height="8" pin="280,110" width="8" x="96" y="16"/>
       <circ-port height="8" pin="330,110" width="8" x="86" y="16"/>
@@ -690,7 +655,7 @@
     <wire from="(430,110)" to="(430,230)"/>
     <wire from="(450,230)" to="(510,230)"/>
     <wire from="(450,240)" to="(580,240)"/>
-    <wire from="(450,250)" to="(740,250)"/>
+    <wire from="(450,250)" to="(650,250)"/>
     <wire from="(450,260)" to="(720,260)"/>
     <wire from="(450,310)" to="(450,370)"/>
     <wire from="(450,310)" to="(470,310)"/>
@@ -711,6 +676,7 @@
     <wire from="(550,340)" to="(620,340)"/>
     <wire from="(570,310)" to="(580,310)"/>
     <wire from="(580,240)" to="(580,310)"/>
+    <wire from="(580,240)" to="(770,240)"/>
     <wire from="(590,310)" to="(590,370)"/>
     <wire from="(590,310)" to="(610,310)"/>
     <wire from="(590,370)" to="(660,370)"/>
@@ -720,8 +686,9 @@
     <wire from="(620,340)" to="(690,340)"/>
     <wire from="(640,310)" to="(650,310)"/>
     <wire from="(650,180)" to="(650,220)"/>
-    <wire from="(650,220)" to="(650,310)"/>
+    <wire from="(650,220)" to="(650,250)"/>
     <wire from="(650,220)" to="(770,220)"/>
+    <wire from="(650,250)" to="(650,310)"/>
     <wire from="(660,310)" to="(660,370)"/>
     <wire from="(660,310)" to="(680,310)"/>
     <wire from="(670,320)" to="(670,420)"/>
@@ -732,8 +699,6 @@
     <wire from="(720,200)" to="(770,200)"/>
     <wire from="(720,260)" to="(720,310)"/>
     <wire from="(720,260)" to="(770,260)"/>
-    <wire from="(740,240)" to="(740,250)"/>
-    <wire from="(740,240)" to="(770,240)"/>
   </circuit>
   <circuit name="SRF">
     <a name="appearance" val="custom"/>
@@ -2361,8 +2326,8 @@
     <appear>
       <rect fill="none" height="30" stroke="#000000" stroke-width="2" width="40" x="120" y="50"/>
       <circ-anchor facing="east" height="6" width="6" x="157" y="47"/>
-      <circ-port height="10" pin="530,210" width="10" x="145" y="45"/>
-      <circ-port height="8" pin="250,140" width="8" x="126" y="46"/>
+      <circ-port height="10" pin="530,210" width="10" x="125" y="45"/>
+      <circ-port height="8" pin="250,140" width="8" x="146" y="46"/>
       <circ-port height="8" pin="250,230" width="8" x="116" y="66"/>
     </appear>
     <comp lib="0" loc="(250,140)" name="Pin">
