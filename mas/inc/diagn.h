@@ -15,11 +15,13 @@ struct Position {
     std::string to_str() const;
 };
 
-class Exception : std::exception {
+class Exception : public std::exception {
+    std::string what_message;
+
 public:
-    const std::string &message;
-    const Position *pos;
     Exception(const Position *pos, const std::string &message);
+
+    const char *what() const noexcept override;
 };
 
 class Diagn {

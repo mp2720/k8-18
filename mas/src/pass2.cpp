@@ -26,7 +26,7 @@ PassTwo::PassTwo(std::map<std::string, Label> (&labels)[4], std::vector<MicInstr
 }
 
 PassTwo::~PassTwo() {
-    delete bytes;
+    delete[] bytes;
 }
 
 void PassTwo::report_label(const std::string &name, const Label &label) {
@@ -40,7 +40,7 @@ void PassTwo::occupy(uint16_t address) {
 
 void PassTwo::try_occupy(const Position *pos, uint16_t address) {
     if (map.test(address))
-        throw AllocationException(pos, "address is already occupied");
+        throw AllocationException(pos, "address " + i2hex(address, 3) + " is already occupied");
     else
         occupy(address);
 }

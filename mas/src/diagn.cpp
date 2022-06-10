@@ -15,9 +15,17 @@ std::string Position::to_str() const {
     return std::string(path) + ":" + std::to_string(line);
 }
 
-Exception::Exception(const Position *pos, const std::string &message) :
-        pos(pos),
-        message(message) {}
+Exception::Exception(const Position *pos, const std::string &message) {
+    if (pos != nullptr)
+        what_message += pos->to_str();
+
+    what_message += ": ";
+    what_message += message;
+}
+
+const char *Exception::what() const noexcept {
+    return what_message.c_str();
+}
 
 void Diagn::issue(bool isError, const Position *pos, const std::string &message) {
     std::string str = isError ? "ERROR" : "WARNING";

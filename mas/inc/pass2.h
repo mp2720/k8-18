@@ -7,9 +7,9 @@
 #include "pass1.h"
 
 /** Ошибка, возникшая при выделении адреса. */
-class AllocationException : Exception {
+class AllocationException : public Exception {
 public:
-    AllocationException(const Position *pos, const std::string &message);;
+    AllocationException(const Position *pos, const std::string &message);
 };
 
 class PassTwo {

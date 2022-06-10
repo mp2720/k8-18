@@ -4,7 +4,6 @@
 #include "diagn.h"
 #include <fstream>
 #include <string>
-#include <optional>
 #include <cstdint>
 
 class Cursor {
