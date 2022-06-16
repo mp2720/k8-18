@@ -502,13 +502,15 @@ void PassOne::proc_mic_instr(bool is_mnemonic, const std::string &first_tok) {
     std::string tok = first_tok;
     while (true) {
         if (tok.empty()) {
-            if (!is_mnemonic)
+            if (!is_mnemonic) {
                 // Possible only if '%' were given.
                 expected("control signal was expected after '%'");
-            else
+                return;
+            }
+            else {
                 warning("redundant semicolon");
-
-            return;
+                break;
+            }
         }
 
         if (is_mnemonic)
