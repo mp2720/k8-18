@@ -149,24 +149,24 @@ void PassOne::proc_mem_opnd(const std::string &opnd1, const std::string &opnd2) 
         // Считать X.
         set_bit(GOE, "goe");
         set_field(GRS0, 2, 0, "grs");
-    }
+    } else {
+        // Номер регистра для SRS.
+        int low_reg;
+        if (opnd2 == "ip")
+            low_reg = 0;
+        else if (opnd2 == "sp")
+            low_reg = 2;
+        else if (opnd2 == "tmp")
+            low_reg = 4;
+        else {
+            expected("8-bit registers: IPH, SPH, TMPH, Y, 16-bits registers: IP, SP, TMP, P/YX or 0 as wr/rd second "
+                     "operand");
+            return;
+        }
 
-    // Номер регистра для SRS.
-    int low_reg;
-    if (opnd2 == "ip")
-        low_reg = 0;
-    else if (opnd2 == "sp")
-        low_reg = 2;
-    else if (opnd2 == "tmp")
-        low_reg = 4;
-    else {
-        expected("8-bit registers: IPH, SPH, TMPH, Y, 16-bits registers: IP, SP, TMP, P/YX or 0 as wr/rd second "
-                 "operand");
-        return;
+        set_field(SRS0, 3, low_reg, "srs");
+        set_bit(SOE, "soe");
     }
-
-    set_field(SRS0, 3, low_reg, "srs");
-    set_bit(SOE, "soe");
 }
 
 void PassOne::proc_reg8_opnd(bool is_dest, const std::string &opnd) {
@@ -506,8 +506,7 @@ void PassOne::proc_mic_instr(bool is_mnemonic, const std::string &first_tok) {
                 // Possible only if '%' were given.
                 expected("control signal was expected after '%'");
                 return;
-            }
-            else {
+            } else {
                 warning("redundant semicolon");
                 break;
             }
