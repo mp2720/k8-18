@@ -90,7 +90,8 @@ void PassTwo::proc_prev_mic_instr(MicInstr *prev, uint16_t cur_address, uint16_t
             prev->nmip = Nmip(0); // Если текущий адрес равен предыдущему, то это последняя микроинструкция.
         else
             prev->nmip = Nmip(cur_address);
-    }
+    } else if (prev->nmip.type == Nmip::TYPE_LABEL)
+        find_label_address(&prev->pos, prev->nmip.label, prev->nmip.address);
 
     prev->bits.set_field(NMIP0, 12, prev->nmip.address);
 
