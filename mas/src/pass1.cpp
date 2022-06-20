@@ -148,7 +148,7 @@ void PassOne::proc_mem_opnd(const std::string &opnd1, const std::string &opnd2) 
 
         // Считать X.
         set_bit(GOE, "goe");
-        set_field(GRS0, 2, 0, "grs");
+        set_field(GRS0, 2, 3, "grs");
     } else {
         // Номер регистра для SRS.
         int low_reg;
