@@ -99,8 +99,9 @@ void PassTwo::proc_prev_mic_instr(MicInstr *prev, uint16_t cur_address, uint16_t
         prev->bits.set_field(CND_NMIP0, 12, prev->cnd_nmip.address);
 
     // Запись байтов микроинструкции в массив.
-    for (int i = 0, bit = 48; i < 7; i++, bit -= 8)
-        bytes[prev_address * MicInstrBits::SIZE_BYTES + i] = prev->bits.get_field(Bit(bit), 8);
+    uint16_t a = prev_address * MicInstrBits::SIZE_BYTES;
+    for (int i = 0, bit = 0; i < 7; i++, bit += 8)
+        bytes[a + i] = prev->bits.get_field(Bit(bit), 8);
 }
 
 void PassTwo::exec() {
