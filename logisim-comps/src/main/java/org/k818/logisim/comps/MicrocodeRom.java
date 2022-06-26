@@ -57,10 +57,8 @@ public class MicrocodeRom extends InstanceFactory {
         Value mip = state.getPort(PORT_MIP);
         Value reload = state.getPort(PORT_RELOAD);
 
-        // /home/tim/k8-18/mc.bin
-        var microcode = Microcode.get(state);
-
         String path = state.getAttributeValue(pathAttr);
+        var microcode = Microcode.get(state, path);
         if (!path.isEmpty())
             microcode.reloadIfNeeded(reload.toIntValue() == 1, path);
 

@@ -44,11 +44,13 @@ class Microcode implements Cloneable, InstanceData {
     /**
      * Получение микрокода из состояния ПЗУ (создание нового в случае необходимости).
      */
-    public static Microcode get(InstanceState state) {
+    public static Microcode get(InstanceState state, String sourcePath) {
         Microcode ret = (Microcode) state.getData();
         if (ret == null) {
             // Создание микрокода если его еще нет.
             ret = new Microcode();
+            ret.reloadIfNeeded(true, sourcePath);
+            ret.prevReloadValue = false;
             state.setData(ret);
         }
 
@@ -80,8 +82,9 @@ class Microcode implements Cloneable, InstanceData {
 
         int i = addr * MINSTR_SIZE;
 
-        int part1 =  bytes[i++] | bytes[i++] << 8 | bytes[i++] << 16 | bytes[i++] << 24;
-        int part2 =  bytes[i++] | bytes[i++] << 8 | bytes[i] << 16;
+        int part1 = (bytes[i] & 0xff) | (bytes[i + 1] & 0xff) << 8 | (bytes[i + 2] & 0xff) << 16 | (bytes[i + 3] & 0xff)
+                << 24;
+        int part2 = (bytes[i + 4] & 0xff) | (bytes[i + 5] & 0xff) << 8 | (bytes[i + 6] & 0xff) << 16;
 
         return MInstr.createForInt(part1, part2);
     }
