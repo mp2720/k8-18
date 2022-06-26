@@ -2,14 +2,9 @@ package org.k818.logisim.comps;
 
 import com.cburch.logisim.data.BitWidth;
 import com.cburch.logisim.data.Value;
-import com.cburch.logisim.instance.InstanceData;
 import com.cburch.logisim.instance.InstanceState;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-
-class Microcode implements Cloneable, InstanceData {
+class Microcode extends RomContents {
     private static final int SIZE = 4096;
     private static final int MINSTR_SIZE = 7;
 
@@ -30,71 +25,40 @@ class Microcode implements Cloneable, InstanceData {
         }
     }
 
-    private byte[] bytes;
-    private boolean loadingError = false;
-    /**
-     * Предыдущее значение входа reload.
-     */
-    private boolean prevReloadValue = false;
-
     public Microcode() {
-        bytes = new byte[SIZE * MINSTR_SIZE];
+        super();
     }
 
-    /**
-     * Получение микрокода из состояния ПЗУ (создание нового в случае необходимости).
-     */
     public static Microcode get(InstanceState state, String sourcePath) {
-        Microcode ret = (Microcode) state.getData();
-        if (ret == null) {
-            // Создание микрокода если его еще нет.
-            ret = new Microcode();
-            ret.reloadIfNeeded(true, sourcePath);
-            ret.prevReloadValue = false;
-            state.setData(ret);
-        }
-
-        return ret;
+        return (Microcode) getInstance(state, sourcePath, Microcode::new);
     }
 
-    /**
-     * Перезагрузка содержимого ПЗУ из файла в случае необходимости.
-     *
-     * @param reloadPinValue текущее значение пина перезаргузки.
-     */
-    public void reloadIfNeeded(boolean reloadPinValue, String sourcePath) {
-        try {
-            // Перезагрузка возможно только при переходе значения входа reload от false к true.
-            if (reloadPinValue && !prevReloadValue) {
-                bytes = Files.readAllBytes(new File(sourcePath).toPath());
-                loadingError = false;
-            }
-        } catch (IOException e) {
-            loadingError = true;
-        } finally {
-            prevReloadValue = reloadPinValue;
-        }
-    }
-
-    public MInstr getByAddr(int addr) {
-        if (addr < 0 || addr >= SIZE || loadingError)
+    public MInstr getMInstrByAddr(int addr) {
+        int start = addr * MINSTR_SIZE;
+        Value firstByte = getValueByAddr(start);
+        if (firstByte.isErrorValue())
             return MInstr.createError();
 
-        int i = addr * MINSTR_SIZE;
+        // Чтение первой части.
+        int part1 = 0;
+        for (int i = 0, shift = 0; i < 4; i++, shift += 8) {
+            Value v = getValueByAddr(i + start);
+            if (v.isErrorValue())
+                return MInstr.createError();
 
-        int part1 = (bytes[i] & 0xff) | (bytes[i + 1] & 0xff) << 8 | (bytes[i + 2] & 0xff) << 16 | (bytes[i + 3] & 0xff)
-                << 24;
-        int part2 = (bytes[i + 4] & 0xff) | (bytes[i + 5] & 0xff) << 8 | (bytes[i + 6] & 0xff) << 16;
+            part1 |= v.toIntValue() << shift;
+        }
+
+        // Чтение второй части.
+        int part2 = 0;
+        for (int i = 0, shift = 0; i < 3; i++, shift += 8) {
+            Value v = getValueByAddr(i + 4 + start);
+            if (v.isErrorValue())
+                return MInstr.createError();
+
+            part2 |= v.toIntValue() << shift;
+        }
 
         return MInstr.createForInt(part1, part2);
-    }
-
-    @Override
-    public Object clone() {
-        try {
-            return super.clone();
-        } catch (CloneNotSupportedException e) {
-            return null;
-        }
     }
 }

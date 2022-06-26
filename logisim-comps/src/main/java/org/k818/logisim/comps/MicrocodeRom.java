@@ -1,13 +1,8 @@
 package org.k818.logisim.comps;
 
-import com.cburch.logisim.data.Attribute;
-import com.cburch.logisim.data.Attributes;
-import com.cburch.logisim.data.Bounds;
-import com.cburch.logisim.data.Value;
-import com.cburch.logisim.instance.InstanceFactory;
-import com.cburch.logisim.instance.InstancePainter;
-import com.cburch.logisim.instance.InstanceState;
-import com.cburch.logisim.instance.Port;
+import com.cburch.logisim.data.*;
+import com.cburch.logisim.instance.*;
+import com.cburch.logisim.util.StringGetter;
 import com.cburch.logisim.util.StringUtil;
 
 public class MicrocodeRom extends InstanceFactory {
@@ -16,10 +11,11 @@ public class MicrocodeRom extends InstanceFactory {
     private final int PORT_RELOAD = 2;
     private final int PORT_MI1 = 3;
 
+    private static final StringGetter nameGetter = StringUtil.constantGetter("Microcode 56-bit ROM for K8-18");
     private final Attribute<String> pathAttr = Attributes.forString("File path");
 
     public MicrocodeRom() {
-        super("K8-18 Microcode ROM", StringUtil.constantGetter("K8-18 Microcode ROM"));
+        super(nameGetter.get(), nameGetter);
 
         setAttributes(new Attribute[]{pathAttr},
                 new Object[]{""});
@@ -63,7 +59,7 @@ public class MicrocodeRom extends InstanceFactory {
             microcode.reloadIfNeeded(reload.toIntValue() == 1, path);
 
         if (mip.isFullyDefined()) {
-            var mi = microcode.getByAddr(mip.toIntValue());
+            var mi = microcode.getMInstrByAddr(mip.toIntValue());
             state.setPort(PORT_MI1, mi.part1(), 1);
             state.setPort(PORT_MI2, mi.part2(), 1);
         }

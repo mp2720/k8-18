@@ -5,17 +5,16 @@ import com.cburch.logisim.tools.Library;
 
 import java.util.List;
 
-//  org.k818.logisim.comps.Components
 public class Components extends Library {
     private final List<AddTool> tools;
 
     public Components() {
-        tools = List.of(new AddTool(new MicrocodeRom()));
+        tools = List.of(new AddTool(new MicrocodeRom()), new AddTool(new Rom()));
     }
 
     @Override
     public String getDisplayName() {
-        return "K8-18 Microcode ROM";
+        return "K8-18 Components";
     }
 
     @Override
