@@ -1,0 +1,38 @@
+# Микрокод для набора инструкций Brainfuck
+# Регистры
+# P(16) - адрес ячейки данных.
+# IP(16) - адрес текущей инструкции.
+# SP(16) - адрес вершины стека.
+# A(8) - аккумулятор.
+# Флаги
+# A - всегда 1, для операции инкремента.
+# C - переполнение при сложении.
+# Память
+# $00000-$0ffff - код.
+# $10000-$1ffff - данные (с начала), стек (с конца).
+
+@instr(fff)
+init:
+    # Запись в DS $4
+    inv; stf; %fs(4)
+    ldf; mov ss, 0
+    # Запись в SP $ffff
+    dec sp
+    # Установка флага А.
+    inv; stf; fs a; jmp next
+
+next:
+    rd cs, ip; %nxt
+
+# >
+@instr(03e)
+next_cell:
+    add x, x, 0; %ec; %sa; fs c
+    add y, y, 0; %ec; inc ip; jmp next
+
+# +
+@instr(02b)
+inc_cell:
+    rd ds, p
+    add md, md, 0; %ec; %sa; inc ip
+    wr ds, p; jmp next
