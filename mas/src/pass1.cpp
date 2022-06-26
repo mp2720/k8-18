@@ -350,8 +350,8 @@ void PassOne::proc_mnemonic(const std::string &str) {
         MN_INV
     };
     std::map<const std::string, std::pair<int, Mnemonic>> mnemonics = {
-            {"add",  {3, MN_ADD}},
             {"or",   {3, MN_OR}},
+            {"add",  {3, MN_ADD}},
             {"and",  {3, MN_AND}},
             {"xor",  {3, MN_XOR}},
 
