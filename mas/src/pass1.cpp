@@ -280,10 +280,10 @@ void PassOne::proc_label(const std::string &ident) {
 void PassOne::proc_ctrl_signal(const std::string &ctrl_signal) {
     const std::string bits[] = {
             "goe", "gwe", "gws0", "gws1", "grs0", "grs1", "rr", "rl", "op0",
-            "op1", "inv", "ec", "sa", "feo", "fs0", "fs1", "fs2", "fs3",
+            "op1", "inb", "ec", "sa", "feo", "fs0", "fs1", "fs2", "fs3",
             "fs4", "fs5", "fs6", "fs7", "fws", "sws0", "sws1", "sws2", "swe",
             "srs0", "srs1", "srs2", "soe", "isp", "iip", "dec", "ds", "cs",
-            "he", "hs0", "hs1", "wr", "cnd", "rd", "nxt", "reserved"
+            "he", "hs0", "hs1", "wr", "cnd", "rd", "nxt", "ina"
     };
 
     // Key is name of field, value is a pair of first bit and size (in bits).
@@ -329,9 +329,9 @@ void PassOne::proc_ctrl_signal(const std::string &ctrl_signal) {
 
 void PassOne::proc_mnemonic(const std::string &str) {
     enum Mnemonic {
+        MN_OR,
         MN_ADD,
         MN_AND,
-        MN_OR,
         MN_XOR,
 
         MN_RD,
@@ -346,8 +346,7 @@ void PassOne::proc_mnemonic(const std::string &str) {
 
         MN_NOP,
         MN_LDF,
-        MN_STF,
-        MN_INV
+        MN_STF
     };
     std::map<const std::string, std::pair<int, Mnemonic>> mnemonics = {
             {"or",   {3, MN_OR}},
@@ -368,7 +367,6 @@ void PassOne::proc_mnemonic(const std::string &str) {
             {"nop",  {0, MN_NOP}},
             {"ldf",  {0, MN_LDF}},
             {"stf",  {0, MN_STF}},
-            {"inv",  {0, MN_INV}}
     };
 
     std::string opnds[3];
@@ -422,10 +420,6 @@ void PassOne::proc_mnemonic(const std::string &str) {
         case MN_STF:
             // Загрузить флаги с шины С.
             set_bit(FWS, "fws");
-            break;
-        case MN_INV:
-            // Инвертировать шину С.
-            set_bit(INV, "inv");
             break;
 
 
@@ -489,7 +483,7 @@ void PassOne::proc_mnemonic(const std::string &str) {
 
             // 3 операнда:
         default:
-            set_field(OP0, 2, mnemonic - MN_ADD, "OP");
+            set_field(OP0, 2, mnemonic - MN_OR, "OP");
             proc_reg8_opnd(true, opnds[0]);
             proc_reg8_opnd(false, opnds[1]);
             proc_reg8_opnd(false, opnds[2]);
