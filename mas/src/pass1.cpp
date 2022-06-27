@@ -150,19 +150,23 @@ void PassOne::proc_mem_opnd(const std::string &opnd1, const std::string &opnd2) 
         set_bit(GOE, "goe");
         set_field(GRS0, 2, 3, "grs");
     } else {
-        // Номер регистра для SRS.
-        int low_reg;
-        if (opnd2 == "ip")
+        int low_reg, high_reg;
+        if (opnd2 == "ip") {
             low_reg = 0;
-        else if (opnd2 == "sp")
+            high_reg = 0;
+        } else if (opnd2 == "sp") {
             low_reg = 2;
-        else if (opnd2 == "tmp")
+            high_reg = 1;
+        } else if (opnd2 == "tmp") {
             low_reg = 4;
-        else {
+            high_reg = 3;
+        } else {
             expected("8-bit registers: IPH, SPH, TMPH, Y, 16-bits registers: IP, SP, TMP, P/YX or 0 as wr/rd second "
                      "operand");
             return;
         }
+
+        set_field(HS0, 2, high_reg, "hs");
 
         set_field(SRS0, 3, low_reg, "srs");
         set_bit(SOE, "soe");
