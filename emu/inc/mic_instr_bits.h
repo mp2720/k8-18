@@ -24,7 +24,7 @@ enum Bit {
     OP0 = 8,
     OP1 = 9,
     /** Invert B-bus. */
-    INV = 10,
+    INB = 10,
     /** Enable carry. */
     EC = 11,
     /** Select auxiliary carry. */
@@ -95,7 +95,7 @@ enum Bit {
     RD = 41,
     /** Handle next opcode. */
     NXT = 42,
-    RESERVED = 43,
+    INA = 43,
     /** Next micro-instruction pointer. */
     NMIP0 = 44,
     NMIP1 = 45,
@@ -121,7 +121,7 @@ enum Bit {
     CND_NMIP7 = RL,
     CND_NMIP8 = OP0,
     CND_NMIP9 = OP1,
-    CND_NMIP10 = INV,
+    CND_NMIP10 = INB,
     CND_NMIP11 = EC
 };
 

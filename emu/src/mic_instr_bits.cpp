@@ -29,11 +29,12 @@ std::vector<std::string> MicInstrBits::find_conflicts() const {
             || bits.test(RR)
             || bits.test(RL)
             || get_field(OP0, 2)
-            || bits.test(INV)
+            || bits.test(INB)
             || bits.test(EC))
             conflicts.push_back("conditional NMIP is given with GOE, GWE, GWS, GRS, RR, RL, OP, INV or EC enabled");
     } else {
-        if (bits.test(FEO) && (bits.test(INV) || bits.test(GOE) || bits.test(SOE)))
+        if (bits.test(FEO) && (bits.test(INB) || bits.test(INA) || bits.test(GOE)
+                               || bits.test(SOE)))
             conflicts.push_back("inverted output to C-bus from ALU and flags enabled");
 
         if (bits.test(RR) && bits.test(RL))
