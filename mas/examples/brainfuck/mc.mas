@@ -10,19 +10,26 @@
 # Память
 # $00000-$0ffff - код.
 # $10000-$1ffff - данные (с начала), стек (с конца).
+# $20000 - вывод на TTY и ввод с клавиатуры.
+
+@instr(0)
+trap:
+    jmp trap
 
 @instr(fff)
 init:
-    # Запись в DS $4
-    inv; stf; %fs(4)
+    # Запись сегментов.
+    %ina; stf; %fs(84)
     ldf; mov ss, 0
+    # Очистка флагов.
+    stf; %fs(84)
     # Запись в SP $ffff
     dec sp
     # Установка флага А.
-    inv; stf; fs a; jmp next
+    %ina; stf; fs a; jmp next
 
 next:
-    rd cs, ip; %nxt
+    rd 0, ip; %nxt
 
 # >
 @instr(03e)
@@ -30,9 +37,61 @@ next_cell:
     add x, x, 0; %ec; %sa; fs c
     add y, y, 0; %ec; inc ip; jmp next
 
+# <
+@instr(03c)
+prev_cell:
+    %inb; add x, x, 0; %ec; %sa; fs c
+    %inb; add y, y, 0; %ec; inc ip; jmp next
+
 # +
 @instr(02b)
 inc_cell:
     rd ds, p
     add md, md, 0; %ec; %sa; inc ip
     wr ds, p; jmp next
+
+# -
+@instr(02d)
+dec_cell:
+    rd ds, p
+    %ina; add md, md, 0; %ec; %sa; inc ip
+    wr ds, p; jmp next
+
+# [
+@instr(05b)
+loop_start:
+    inc ip
+    mov md, iph
+    wr ds, sp
+    mov md, ipl; dec sp
+    wr ds, sp
+    dec sp; jmp next
+
+# ]
+@instr(05d)
+loop_end:
+    rd ds, p; inc ip
+    mov md, md; fs z; inc sp  # Проверка того, что текущая ячейка равна нулю.
+    jcnd loop_end1; jmp loop_cont; fs z
+
+loop_end1:
+    rd 0, ip; %nxt; inc sp
+
+loop_cont:
+    rd ds, sp
+    mov ipl, md; dec sp
+    rd ds, sp
+    mov iph, md; jmp next
+
+# .
+@instr(02e)
+print:
+    rd ds, p; inc ip
+    wr cs, 0; jmp next
+
+# ,
+# TODO: доработать инструкцию и схему ЦП.
+#@instr(02c)
+#read:
+#    rd cs, 0; inc ip
+#    wr ds, p; jmp next
