@@ -95,8 +95,12 @@ void PassTwo::proc_prev_mic_instr(MicInstr *prev, uint16_t cur_address, uint16_t
 
     prev->bits.set_field(NMIP0, 12, prev->nmip.address);
 
-    if (prev->bits.get_bit(CND))
+    if (prev->bits.get_bit(CND) && prev->cnd_nmip.type != Nmip::TYPE_NONE) {
+        if (prev->cnd_nmip.type == Nmip::TYPE_LABEL)
+            find_label_address(&prev->pos, prev->cnd_nmip.label, prev->cnd_nmip.address);
+
         prev->bits.set_field(CND_NMIP0, 12, prev->cnd_nmip.address);
+    }
 
     // Запись байтов микроинструкции в массив.
     uint16_t a = prev_address * MicInstrBits::SIZE_BYTES;
